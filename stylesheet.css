@@ -1,0 +1,10 @@
+.same-size-thumbnail {
+    position: relative;
+    width:  250px;
+    height: 400px;
+    background-position: 50% 50%;
+    background-repeat:   no-repeat;
+    background-size:     cover;
+    overflow: hidden;
+    border: transparent;
+}
