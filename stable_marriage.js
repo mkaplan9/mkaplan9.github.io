@@ -13,12 +13,12 @@ let b_objects = ""
 
 a_objects = {
   "1": {
-    preference_keys: ["1","2"],
+    preference_keys: ["2","1"],
     is_paired: false,
     match: null
   },
   "2": {
-    preference_keys: ["2","1"],
+    preference_keys: ["1","2"],
     is_paired: false,
     match: null
   }
@@ -26,41 +26,69 @@ a_objects = {
 
 b_objects = {
   "1": {
-    preference_keys: ["1","2"],
+    preference_keys: ["2","1"],
     is_paired: false,
     match: null
   },
   "2": {
-    preference_keys: ["2","1"],
+    preference_keys: ["1","2"],
     is_paired: false,
     match: null
   }
 }
 
-const is_stable = false
-while (!is_stable) {
-  Object.keys(a_objects).forEach(function (a_object_key) {
-    a_object = a_objects[a_object_key]
-    if (!a_object.is_paired) {
-      while (!a_object.is_paired) {
-        let potential_match_b
-        let old_match
-        a_object.preference_keys.forEach(function (pref_object_key) {
-          potential_match_b = b_objects[pref_object_key]
-          if (potential_match_b.prefers(a_object)) {
-            old_match_a = potential_match_b.match
-            if (old_match) {
-              old_match.match = null
-              old_match.is_paired = false
+console.log("Set vars")
+
+var is_stable = false
+var i = 0
+while ((!is_stable) && (i < 100)) {                                                    
+  i += 1
+  console.log(i)
+  Object.keys(a_objects).forEach(function (a_object_key) {              // For each A object
+    console.log("In for loop")
+    a_object = a_objects[a_object_key]                                  // Get object
+    if (!a_object.is_paired) {                                          // If not paired
+      let potential_match_b
+      let old_match
+      stop = false
+      a_object.preference_keys.forEach(function (pref_object_key) {   // For each pref in order
+        if (!stop) {
+          potential_match_b = b_objects[pref_object_key]              // Get the pref
+          if (switch_to(potential_match_b, a_object_key)) {                  // If the pref prefers A point to each other
+            old_match_a_key = potential_match_b.match
+            var old_match_a = a_objects[old_match_a_key]
+            if (old_match_a) {
+              old_match_a.match = null
+              old_match_a.is_paired = false
             }
-            potential_match_b.match = a_object
+            potential_match_b.match = a_object_key
             potential_match_b.is_paired = true
-            a_object.match = potential_match_b
+            a_object.match = pref_object_key
             a_object.is_paired = true
-            break
+            stop = true                                                // Break from loop
           }
-        })
-      }
+        }
+      })
     }
   })
+
+  is_stable = true
+  Object.keys(a_objects).forEach(function (a_object_key) {
+    var a_object = a_objects[a_object_key]
+    if (!a_object.is_paired) {
+      is_stable = false
+    }
+  })
+}
+
+console.log(a_objects)
+console.log(b_objects)
+
+function switch_to(object_with_preference, candidate_key) {
+  var current_match_key = object_with_preference.match
+  var prefs = object_with_preference.preference_keys
+  if ((current_match_key == null) || (prefs.indexOf(candidate_key) < prefs.indexOf(current_match_key))) {
+    return true
+  }
+  return false
 }
