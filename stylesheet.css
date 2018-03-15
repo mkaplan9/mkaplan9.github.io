@@ -8,3 +8,30 @@
     overflow: hidden;
     border: transparent;
 }
+
+.right {
+  text-align: right;
+  margin-left: auto;
+}
+
+.left {
+  text-align: left;
+  margin-right: auto;
+}
+
+.center {
+  text-align: center;
+}
+
+.black {
+  color: #000000;
+}
+
+.index-thumbnail-container {
+  height: 300px;
+}
+
+.index-thumbnail-container img {
+  width: auto;
+  height: 100%;
+}
