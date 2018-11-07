@@ -95,15 +95,14 @@ var config = {
 document.getElementById('startDateButton').addEventListener('click', function() {
   var startDate = document.getElementById('startDate').value
   var startIndex = dates.indexOf(startDate)
-  debugger;
-	// config.data.datasets.forEach(function(dataset) {
-	// 	dataset.data = dataset.data.map(function() {
-	// 		return randomScalingFactor();
-	// 	});
-  //
-	// });
-  //
-	// window.myLine.update();
+
+  config.data.labels = dates.slice(startIndex, -1);
+
+	config.data.datasets.forEach(function(dataset) {
+		dataset.data = prices.slice(startIndex, -1);
+	});
+
+	chart.update();
 });
 
 
