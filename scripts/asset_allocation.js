@@ -1,5 +1,23 @@
 var ctx = document.getElementById('myChart').getContext('2d');
 
+var colors = [
+  'rgb(222, 130, 50)',
+  'rgb(0, 180, 175)',
+  'rgb(0, 172, 252)',
+  'rgb(35, 99, 132)',
+  'rgb(35, 9, 132)',
+  'rgb(114, 0, 0)',
+  'rgb(0, 53, 0)',
+  'rgb(35, 200, 0)',
+  'rgb(0, 211, 186)',
+  'rgb(230, 124, 255)',
+  'rgb(255, 44, 162)',
+  'rgb(200, 200, 0)',
+  'rgb(0, 223, 121)',
+  'rgb(91, 191, 255)',
+  'rgb(255, 136, 255)'
+]
+
 var sAndP = [
   ["1956", 45.16],
   ["1957", 46.20],
@@ -69,6 +87,8 @@ var sAndP = [
 
 var dates = sAndP.map(x => x[0]);
 var prices = sAndP.map(x => x[1]);
+var startIndex = 0
+var endIndex = -1
 
 var config = {
     // The type of chart we want to create
@@ -78,7 +98,7 @@ var config = {
     data: {
         labels: dates.slice(0, -1),
         datasets: [{
-            label: "Raw S&P",
+            label: "100% S&P",
             borderColor: 'rgb(255, 99, 132)',
             data: prices.slice(0, -1),
         }]
@@ -93,11 +113,33 @@ var config = {
     }
 }
 
+document.getElementById('addLine').addEventListener('click', function() {
+  var percentStocks = document.getElementById('percentStocks').value
+  if(percentStocks <= 100 && percentStocks >= 0) {
+    var newLine = prices.slice(startIndex, endIndex)
+    newLine = newLine.map(function(el) { return el * percentStocks / 100 })
+
+    var colorIndex = Math.floor(Math.random() * colors.length)
+
+  	config.data.datasets.push({
+      label: `${percentStocks}% S&P`,
+      borderColor: colors[colorIndex],
+      data: newLine
+    })
+  	chart.update();
+  }
+});
+
+document.getElementById('clear').addEventListener('click', function() {
+	config.data.datasets = []
+	chart.update();
+});
+
 document.getElementById('dateButton').addEventListener('click', function() {
   var startDate = document.getElementById('startDate').value
-  var startIndex = dates.indexOf(startDate)
+  startIndex = dates.indexOf(startDate)
   var endDate = document.getElementById('endDate').value
-  var endIndex = dates.indexOf(endDate)
+  endIndex = dates.indexOf(endDate)
 
   if(startIndex >= endIndex) {
     startIndex = 0
