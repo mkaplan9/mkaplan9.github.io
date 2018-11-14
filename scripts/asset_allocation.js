@@ -63,7 +63,8 @@ var sAndP = [
   ["2015", 2058.90],
   ["2016", 2038.20],
   ["2017", 2251.57],
-  ["2018", 2683.73]
+  ["2018", 2683.73],
+  ["Spacer", "Spacer"]
 ]
 
 var dates = sAndP.map(x => x[0]);
@@ -75,11 +76,11 @@ var config = {
 
     // The data for our dataset
     data: {
-        labels: dates,
+        labels: dates.slice(0, -1),
         datasets: [{
             label: "Raw S&P",
             borderColor: 'rgb(255, 99, 132)',
-            data: prices,
+            data: prices.slice(0, -1),
         }]
     },
 
@@ -92,14 +93,29 @@ var config = {
     }
 }
 
-document.getElementById('startDateButton').addEventListener('click', function() {
+document.getElementById('dateButton').addEventListener('click', function() {
   var startDate = document.getElementById('startDate').value
   var startIndex = dates.indexOf(startDate)
+  var endDate = document.getElementById('endDate').value
+  var endIndex = dates.indexOf(endDate)
 
-  config.data.labels = dates.slice(startIndex, -1);
+  if(startIndex >= endIndex) {
+    startIndex = 0
+    endIndex = -2
+  }
 
+  if(startIndex < 0) {
+    startIndex = 0
+  }
+
+  if(endIndex < 0) {
+    endIndex = -2
+  }
+  endIndex = endIndex + 1 // Inclusive end
+
+  config.data.labels = dates.slice(startIndex, endIndex);
 	config.data.datasets.forEach(function(dataset) {
-		dataset.data = prices.slice(startIndex, -1);
+		dataset.data = prices.slice(startIndex, endIndex);
 	});
 
 	chart.update();
