@@ -140,7 +140,7 @@ var bonds = [
 
 var dates = sAndP.map(x => x[0]);
 var sAndPPrices = sAndP.map(x => x[1]);
-var bondPrices = bonds.map(x => x[1]);
+var bondYields = bonds.map(x => x[1]);
 var startIndex = 0
 var endIndex = -1
 
@@ -154,7 +154,7 @@ var config = {
     datasets: [{
       label: "100% S&P",
       borderColor: 'rgb(255, 99, 132)',
-      data: sAndPPrices.slice(0, -1),
+      data: getNewLine(100, 0, -1),
       percentStocks: 100,
       fill: false
     }]
@@ -178,6 +178,10 @@ var config = {
 
 document.getElementById('addLine').addEventListener('click', function() {
   var percentStocks = document.getElementById('percentStocks').value
+  addLine(percentStocks)
+});
+
+function addLine(percentStocks) {
   if(percentStocks <= 100 && percentStocks >= 0) {
     var newLine = getNewLine(percentStocks, startIndex, endIndex)
     var colorIndex = Math.floor(Math.random() * colors.length)
@@ -191,12 +195,16 @@ document.getElementById('addLine').addEventListener('click', function() {
     })
   	chart.update();
   }
-});
+}
 
 document.getElementById('clear').addEventListener('click', function() {
-	config.data.datasets = []
-	chart.update();
+	clear()
 });
+
+function clear() {
+  config.data.datasets = []
+	chart.update();
+}
 
 document.getElementById('dateButton').addEventListener('click', function() {
   var startDate = document.getElementById('startDate').value
@@ -217,38 +225,34 @@ document.getElementById('dateButton').addEventListener('click', function() {
   endIndex = endIndex + 1 // Inclusive end
 
   config.data.labels = dates.slice(startIndex, endIndex);
-
-  # replace with several calls to newline
 	config.data.datasets.forEach(function(dataset) {
-    var newLine = sAndPPrices.slice(startIndex, endIndex)
-    newLine = newLine.map(function(el) { return el * dataset.percentStocks / 100 })
-    dataset.data = newLine
+    dataset.data = getNewLine(dataset.percentStocks, startIndex, endIndex)
 	});
 
 	chart.update();
 });
 
-function getLine(percentStocks, startIndex, endIndex) {
+function getNewLine(percentStocks, startIndex, endIndex) {
   var decimalStocks = percentStocks / 100
   var decimalBonds = 1 - decimalStocks
   var stockReference = sAndPPrices.slice(startIndex, endIndex)
-  var bondsReference = bondPrices.slice(startIndex, endIndex)
+  var bondReference = bondYields.slice(startIndex, endIndex)
   var stockValue
   var bondValue
   var total = 100
-  var newLine = []
+  var newLine = [total]
 
   var iters = stockReference.length
-  iters.forEach(function(iter) {
+  for (iter = 0; iter < iters; iter++) {
     if(iter + 1 == iters) {
-      return
+      break
     }
 
     stockValue = total * decimalStocks
     bondValue = total * decimalBonds
 
     var stockPerformance = stockReference[iter + 1] / stockReference[iter]
-    var bondPerformance = bondReference[iter + 1] / bondReference[iter]
+    var bondPerformance = 1 + bondReference[iter] / 100
 
     var endStock = stockValue * stockPerformance
     var endBond = bondValue * bondPerformance
@@ -256,7 +260,7 @@ function getLine(percentStocks, startIndex, endIndex) {
     total = endStock + endBond
 
     newLine.push(total)
-  })
+  }
 
   return newLine
 }
