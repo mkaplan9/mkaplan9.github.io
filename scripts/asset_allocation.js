@@ -19,13 +19,6 @@ var colors = [
 ]
 
 var sAndP = [
-  ["1956", 45.16],
-  ["1957", 46.20],
-  ["1958", 40.33],
-  ["1959", 55.44],
-  ["1960", 59.91],
-  ["1961", 57.57],
-  ["1962", 71.55],
   ["1963", 63.10],
   ["1964", 75.02],
   ["1965", 84.75],
@@ -85,8 +78,69 @@ var sAndP = [
   ["Spacer", "Spacer"]
 ]
 
+var bonds = [
+  ["1963", 4.00],
+  ["1964", 4.19],
+  ["1965", 4.28],
+  ["1966", 4.93],
+  ["1967", 5.07],
+  ["1968", 5.64],
+  ["1969", 6.67],
+  ["1970", 7.35],
+  ["1971", 6.16],
+  ["1972", 6.21],
+  ["1973", 6.85],
+  ["1974", 7.56],
+  ["1975", 7.99],
+  ["1976", 7.61],
+  ["1977", 7.42],
+  ["1978", 8.41],
+  ["1979", 9.43],
+  ["1980", 11.43],
+  ["1981", 13.92],
+  ["1982", 13.01],
+  ["1983", 11.10],
+  ["1984", 12.46],
+  ["1985", 10.62],
+  ["1986", 7.67],
+  ["1987", 8.39],
+  ["1988", 8.85],
+  ["1989", 8.49],
+  ["1990", 8.55],
+  ["1991", 7.86],
+  ["1992", 7.01],
+  ["1993", 5.87],
+  ["1994", 7.09],
+  ["1995", 6.57],
+  ["1996", 6.44],
+  ["1997", 6.35],
+  ["1998", 5.26],
+  ["1999", 5.65],
+  ["2000", 6.03],
+  ["2001", 5.02],
+  ["2002", 4.61],
+  ["2003", 4.01],
+  ["2004", 4.27],
+  ["2005", 4.29],
+  ["2006", 4.80],
+  ["2007", 4.63],
+  ["2008", 3.66],
+  ["2009", 3.26],
+  ["2010", 3.22],
+  ["2011", 2.78],
+  ["2012", 1.80],
+  ["2013", 2.35],
+  ["2014", 2.54],
+  ["2015", 2.14],
+  ["2016", 1.84],
+  ["2017", 2.33],
+  ["2018", 2.91],
+  ["Spacer", "Spacer"]
+]
+
 var dates = sAndP.map(x => x[0]);
-var prices = sAndP.map(x => x[1]);
+var sAndPPrices = sAndP.map(x => x[1]);
+var bondPrices = bonds.map(x => x[1]);
 var startIndex = 0
 var endIndex = -1
 
@@ -100,7 +154,7 @@ var config = {
     datasets: [{
       label: "100% S&P",
       borderColor: 'rgb(255, 99, 132)',
-      data: prices.slice(0, -1),
+      data: sAndPPrices.slice(0, -1),
       percentStocks: 100,
       fill: false
     }]
@@ -125,9 +179,7 @@ var config = {
 document.getElementById('addLine').addEventListener('click', function() {
   var percentStocks = document.getElementById('percentStocks').value
   if(percentStocks <= 100 && percentStocks >= 0) {
-    var newLine = prices.slice(startIndex, endIndex)
-    newLine = newLine.map(function(el) { return el * percentStocks / 100 })
-
+    var newLine = getNewLine(percentStocks, startIndex, endIndex)
     var colorIndex = Math.floor(Math.random() * colors.length)
 
   	config.data.datasets.push({
@@ -165,14 +217,49 @@ document.getElementById('dateButton').addEventListener('click', function() {
   endIndex = endIndex + 1 // Inclusive end
 
   config.data.labels = dates.slice(startIndex, endIndex);
+
+  # replace with several calls to newline
 	config.data.datasets.forEach(function(dataset) {
-    var newLine = prices.slice(startIndex, endIndex)
+    var newLine = sAndPPrices.slice(startIndex, endIndex)
     newLine = newLine.map(function(el) { return el * dataset.percentStocks / 100 })
     dataset.data = newLine
 	});
 
 	chart.update();
 });
+
+function getLine(percentStocks, startIndex, endIndex) {
+  var decimalStocks = percentStocks / 100
+  var decimalBonds = 1 - decimalStocks
+  var stockReference = sAndPPrices.slice(startIndex, endIndex)
+  var bondsReference = bondPrices.slice(startIndex, endIndex)
+  var stockValue
+  var bondValue
+  var total = 100
+  var newLine = []
+
+  var iters = stockReference.length
+  iters.forEach(function(iter) {
+    if(iter + 1 == iters) {
+      return
+    }
+
+    stockValue = total * decimalStocks
+    bondValue = total * decimalBonds
+
+    var stockPerformance = stockReference[iter + 1] / stockReference[iter]
+    var bondPerformance = bondReference[iter + 1] / bondReference[iter]
+
+    var endStock = stockValue * stockPerformance
+    var endBond = bondValue * bondPerformance
+
+    total = endStock + endBond
+
+    newLine.push(total)
+  })
+
+  return newLine
+}
 
 
 var chart = new Chart(ctx, config);
