@@ -91,26 +91,35 @@ var startIndex = 0
 var endIndex = -1
 
 var config = {
-    // The type of chart we want to create
-    type: 'line',
+  // The type of chart we want to create
+  type: 'line',
 
-    // The data for our dataset
-    data: {
-        labels: dates.slice(0, -1),
-        datasets: [{
-            label: "100% S&P",
-            borderColor: 'rgb(255, 99, 132)',
-            data: prices.slice(0, -1),
-        }]
+  // The data for our dataset
+  data: {
+    labels: dates.slice(0, -1),
+    datasets: [{
+      label: "100% S&P",
+      borderColor: 'rgb(255, 99, 132)',
+      data: prices.slice(0, -1),
+      percentStocks: 100,
+      fill: false
+    }]
+  },
+
+  // Configuration options go here
+  options: {
+    title: {
+      display: true,
+      text: 'Asset Allocation'
     },
-
-    // Configuration options go here
-    options: {
-        title: {
-            display: true,
-            text: 'Asset Allocation'
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true
         }
+      }]
     }
+  }
 }
 
 document.getElementById('addLine').addEventListener('click', function() {
@@ -124,7 +133,9 @@ document.getElementById('addLine').addEventListener('click', function() {
   	config.data.datasets.push({
       label: `${percentStocks}% S&P`,
       borderColor: colors[colorIndex],
-      data: newLine
+      data: newLine,
+      percentStocks: percentStocks,
+      fill: false
     })
   	chart.update();
   }
@@ -145,11 +156,9 @@ document.getElementById('dateButton').addEventListener('click', function() {
     startIndex = 0
     endIndex = -2
   }
-
   if(startIndex < 0) {
     startIndex = 0
   }
-
   if(endIndex < 0) {
     endIndex = -2
   }
@@ -157,7 +166,9 @@ document.getElementById('dateButton').addEventListener('click', function() {
 
   config.data.labels = dates.slice(startIndex, endIndex);
 	config.data.datasets.forEach(function(dataset) {
-		dataset.data = prices.slice(startIndex, endIndex);
+    var newLine = prices.slice(startIndex, endIndex)
+    newLine = newLine.map(function(el) { return el * dataset.percentStocks / 100 })
+    dataset.data = newLine
 	});
 
 	chart.update();
