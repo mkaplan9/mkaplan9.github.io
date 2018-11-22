@@ -315,7 +315,7 @@ var config = {
   data: {
     labels: dates.slice(0, -1),
     datasets: [{
-      label: "100% S&P",
+      label: "100% stocks/0% bonds",
       borderColor: 'rgb(255, 99, 132)',
       data: getNewLine(percentStocks, 0, -1),
       percentStocks: 100,
@@ -374,7 +374,7 @@ function addLine(percentStocks) {
     var colorIndex = Math.floor(Math.random() * colors.length)
 
   	config.data.datasets.push({
-      label: `${percentStocks}% S&P`,
+      label: `${percentStocks}% stocks/${100 - percentStocks}% bonds`,
       borderColor: colors[colorIndex],
       data: newLine,
       percentStocks: percentStocks,
