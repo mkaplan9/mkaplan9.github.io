@@ -48,3 +48,7 @@
 ::placeholder {
   color: rgb(210, 210, 210);
 }
+
+.aa-input-label {
+  margin-bottom: 2px;
+}
