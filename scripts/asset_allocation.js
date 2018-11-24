@@ -321,12 +321,23 @@ var config = {
   options: {
     title: {
       display: true,
+      fontSize: 30,
       text: 'Asset Allocation'
     },
     scales: {
       yAxes: [{
         ticks: {
           beginAtZero: true
+        },
+        scaleLabel: {
+          labelString: "Total Investment Value ($)",
+          display: true
+        }
+      }],
+      xAxes: [{
+        scaleLabel: {
+          labelString: "Year",
+          display: true
         }
       }]
     }
@@ -443,7 +454,7 @@ function getNewLine(percentStocks, startIndex, endIndex) {
 
     total = endStock + endBond
 
-    newLine.push(total)
+    newLine.push(Math.round(total))
   }
 
   return newLine
