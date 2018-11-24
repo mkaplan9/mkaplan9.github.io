@@ -68,37 +68,61 @@
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
     <div class="container marketing">
-      <canvas id="myChart"></canvas>
+      <div class="center">
+        <h2 class="featurette-heading">Asset Allocation Simulation</h2>
+        <div class="col-md-6 col-md-offset-3">
+          <p class="justify">
+            This tool allows you to compare how different asset allocations
+            would have done over time. For now, the options of the tool are
+            stocks, represented by the S&P 500 on January 1st, and bonds,
+            represented by the average yield on 10-Year Treasuries for a
+            given year.
+          </p>
+        </div>
 
-      <h4>Add New Line (enter percent stocks)</h4>
-      <input type="text" id="percentStocks"/>
-      <button id="addLine">Add Line</button>
-      <button id="clear">Clear All Data</button>
-
-      <h4>Set starting amount</h4>
-      <input type="text" id="startingAmount"/>
-      <button id="startingAmountButton">Set Starting Amount</button>
-
-      <h4>Set amount to add each year</h4>
-      <input type="text" id="addAmount"/>
-      <button id="addAmountButton">Set Add Amount</button>
-
-      <h4>Set date range (enter years from 1963 to 2018)</h4>
-      <input type="text" id="startDate"/>
-      <input type="text" id="endDate"/>
-      <button id="dateButton">Set Dates</button>
-
-      <br></br>
+        <div class="col-md-10 col-md-offset-1">
+          <h4>Add New Line (enter percent stocks)</h4>
+          <input type="text" placeholder="70" id="percentStocks"/>
+          <button id="addLine">Add Line</button>
+          <button id="clear">Clear All Data</button>
 
 
 
-      <br></br>
+          <h4>Set starting amount ($)</h4>
+          <input type="text" placeholder="1000" id="startingAmount"/>
+          <button id="startingAmountButton">Set Starting Amount</button>
 
-      <!-- FOOTER -->
-      <footer>
-        <p class="right">&copy; 2018 Max Kaplan</p>
-      </footer>
+          <h4>Set amount to add each year ($)</h4>
+          <input type="text" placeholder="100" id="addAmount"/>
+          <button id="addAmountButton">Set Add Amount</button>
+
+          <br></br>
+
+          <div>
+            <input type="checkbox" id="withDividends">
+            <label for="withDividends">Include Dividends</label>
+          </div>
+
+          <h4>Set date range (enter years from 1963 to 2018)</h4>
+          <input type="text" placeholder="1974" id="startDate"/>
+          <input type="text" placeholder="1987" id="endDate"/>
+          <button id="dateButton">Set Dates</button>
+        </div>
+
+        <div class="col-md-10 col-md-offset-1">
+          <canvas id="myChart" style="padding-top: 50px;"></canvas>
+        </div>
+
+      </div>
     </div>
+    <br></br>
+    <br></br>
+    <!-- FOOTER -->
+    <div class="col-md-10 col-md-offset-1">
+        <footer>
+          <p class="right">&copy; 2018 Max Kaplan</p>
+        </footer>
+      </div>
 
 
     <!-- Bootstrap core JavaScript

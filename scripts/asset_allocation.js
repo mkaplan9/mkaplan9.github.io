@@ -176,6 +176,66 @@ var sAndP = [
   ["Spacer", "Spacer"]
 ]
 
+var dividends = [
+  ["1963", 2.14],
+  ["1964", 2.3],
+  ["1965", 2.52],
+  ["1966", 2.74],
+  ["1967", 2.88],
+  ["1968", 2.93],
+  ["1969", 3.08],
+  ["1970", 3.16],
+  ["1971", 3.13],
+  ["1972", 3.07],
+  ["1973", 3.16],
+  ["1974", 3.4],
+  ["1975", 3.62],
+  ["1976", 3.68],
+  ["1977", 4.1],
+  ["1978", 4.71],
+  ["1979", 5.11],
+  ["1980", 5.7],
+  ["1981", 6.2],
+  ["1982", 6.66],
+  ["1983", 6.88],
+  ["1984", 7.12],
+  ["1985", 7.57],
+  ["1986", 7.94],
+  ["1987", 8.3],
+  ["1988", 8.86],
+  ["1989", 9.81],
+  ["1990", 11.14],
+  ["1991", 12.11],
+  ["1992", 12.24],
+  ["1993", 12.41],
+  ["1994", 12.62],
+  ["1995", 13.18],
+  ["1996", 13.89],
+  ["1997", 14.95],
+  ["1998", 15.55],
+  ["1999", 16.28],
+  ["2000", 16.71],
+  ["2001", 16.17],
+  ["2002", 15.74],
+  ["2003", 16.12],
+  ["2004", 17.6],
+  ["2005", 19.7],
+  ["2006", 22.41],
+  ["2007", 25.08],
+  ["2008", 27.92],
+  ["2009", 28.01],
+  ["2010", 22.24],
+  ["2011", 22.96],
+  ["2012", 26.74],
+  ["2013", 31.54],
+  ["2014", 35.4],
+  ["2015", 39.9],
+  ["2016", 43.55],
+  ["2017", 45.93],
+  ["2018", 49.29],
+  ["Spacer", "Spacer"]
+]
+
 var bonds = [
   ["1963", 4.00],
   ["1964", 4.19],
@@ -239,11 +299,13 @@ var bonds = [
 var dates = sAndP.map(x => x[0]);
 var sAndPPrices = sAndP.map(x => x[1]);
 var bondYields = bonds.map(x => x[1]);
+var dividendTotals = dividends.map(x => x[1]);
 var startIndex = 0
 var endIndex = -1
 var startingAmount = 100
 var addAmount = 0
 var percentStocks = 100
+var withDividends = false
 
 var config = {
   // The type of chart we want to create
@@ -253,7 +315,7 @@ var config = {
   data: {
     labels: dates.slice(0, -1),
     datasets: [{
-      label: "100% S&P",
+      label: "100% stocks/0% bonds",
       borderColor: 'rgb(255, 99, 132)',
       data: getNewLine(percentStocks, 0, -1),
       percentStocks: 100,
@@ -285,6 +347,14 @@ document.getElementById('startingAmountButton').addEventListener('click', functi
   chart.update()
 });
 
+document.getElementById('withDividends').addEventListener('click', function() {
+  withDividends = document.getElementById('withDividends').checked
+  config.data.datasets.forEach(function(dataset) {
+    dataset.data = getNewLine(dataset.percentStocks, startIndex, endIndex)
+	});
+  chart.update()
+});
+
 document.getElementById('addAmountButton').addEventListener('click', function() {
 	addAmount = parseFloat(document.getElementById('addAmount').value)
   config.data.datasets.forEach(function(dataset) {
@@ -304,7 +374,7 @@ function addLine(percentStocks) {
     var colorIndex = Math.floor(Math.random() * colors.length)
 
   	config.data.datasets.push({
-      label: `${percentStocks}% S&P`,
+      label: `${percentStocks}% stocks/${100 - percentStocks}% bonds`,
       borderColor: colors[colorIndex],
       data: newLine,
       percentStocks: percentStocks,
@@ -354,6 +424,7 @@ function getNewLine(percentStocks, startIndex, endIndex) {
   var decimalBonds = 1 - decimalStocks
   var stockReference = sAndPPrices.slice(startIndex, endIndex)
   var bondReference = bondYields.slice(startIndex, endIndex)
+  var dividendReference = dividendTotals.slice(startIndex, endIndex)
   var stockValue
   var bondValue
   var total = startingAmount
@@ -371,8 +442,9 @@ function getNewLine(percentStocks, startIndex, endIndex) {
 
     var stockPerformance = stockReference[iter + 1] / stockReference[iter]
     var bondPerformance = 1 + bondReference[iter] / 100
+    var dividendPerformance = dividendReference[iter + 1] / stockReference[iter + 1]
 
-    var endStock = stockValue * stockPerformance
+    var endStock = stockValue * (stockPerformance + (dividendPerformance * withDividends))
     var endBond = bondValue * bondPerformance
 
     total = endStock + endBond
