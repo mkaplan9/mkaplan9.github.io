@@ -302,10 +302,10 @@ var bondYields = bonds.map(x => x[1]);
 var dividendTotals = dividends.map(x => x[1]);
 var startIndex = 0
 var endIndex = -1
-var startingAmount = 100
-var addAmount = 0
-var percentStocks = 100
-var withDividends = false
+var startingAmount = 1000
+var addAmount = 100
+var percentStocks = 70
+var withDividends = true
 
 var config = {
   // The type of chart we want to create
@@ -314,13 +314,7 @@ var config = {
   // The data for our dataset
   data: {
     labels: dates.slice(0, -1),
-    datasets: [{
-      label: "100% stocks/0% bonds",
-      borderColor: 'rgb(255, 99, 132)',
-      data: getNewLine(percentStocks, 0, -1),
-      percentStocks: 100,
-      fill: false
-    }]
+    datasets: []
   },
 
   // Configuration options go here
@@ -456,3 +450,4 @@ function getNewLine(percentStocks, startIndex, endIndex) {
 }
 
 var chart = new Chart(ctx, config);
+addLine(percentStocks)
