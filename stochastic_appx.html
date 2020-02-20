@@ -63,22 +63,18 @@
       </nav>
     </div>
 
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
     <div class="container marketing">
       <div class="row">
         <div class="col-md-4 col-md-offset-2">
           <div class="col-md-10">
-            <h2 class="featurette-heading">Asset Allocation Simulation</h2>
+            <h2 class="featurette-heading">Stochastic Approximation</h2>
             <p class="justify">
-              This tool allows you to compare how different asset allocations
-              would have done over time. For now, the options of the tool are
-              stocks, represented by the S&P 500 on January 1st of each year,
-              and bonds, represented by the average yield on 10-Year Treasuries
-              for a given year. Neither is a perfect metric, but they're both
-              decent proxies.
+              This tool allows you to experiment with Monte Carlo integration.
+              You can graph a function, and then estimate the definite integral
+              from 0 to 10 using as many points as you'd like (more
+              than 5k is pretty slow though, depending on your hardware).
+              To get started, try graphing `x^2` and then add 100 points at
+              a time. What does the integral converge to?
             </p>
           </div>
         </div>
@@ -86,34 +82,28 @@
           <div style="border: 2px solid grey; padding: 10px">
             <h3 class="center" style="margin-top: 0px">Settings</h3>
 
-            <div class="center">
-              <input type="checkbox" id="withDividends" checked>
-              <label for="withDividends">Include Dividends</label>
+            <h4 class="aa-input-label">Set Function</h4>
+            <input type="text" placeholder="x^3" value="x^3" id="strFormula"/>
+            <button id="graph">Graph new function</button>
+
+            <h4 class="aa-input-label">Number of points</h4>
+            <input type="text" placeholder="1000" value=100 id="numPoints"/>
+            <button id="simulate">Add points to simulation</button>
+
+            <div class="row">
+              <h4 class="col-md-6">Total Points: </h4>
+              <h4 class="col-md-6" id="totalPoints"></h4>
+            </div>
+            <div class="row">
+              <h4 class="col-md-6">Calculated Integral: </h4>
+              <h4 class="col-md-6" id="calculatedIntegral"></h4>
             </div>
 
-            <h4 class="aa-input-label">Set starting amount ($)</h4>
-            <input type="text" placeholder="1000" id="startingAmount"/>
-            <button id="startingAmountButton">Set Starting Amount</button>
-
-            <h4 class="aa-input-label">Set amount to add each year ($)</h4>
-            <input type="text" placeholder="100" id="addAmount"/>
-            <button id="addAmountButton">Set Add Amount</button>
-
-            <h4 class="aa-input-label">Set date range (YYYY)</h4>
-            <input type="text" placeholder="1963" id="startDate"/>
-            <input type="text" placeholder="2018" id="endDate"/>
-            <button id="dateButton">Set Dates</button>
+            <h4>
+              <a id="wolframLink" href="https://www.wolframalpha.com/input/?i=integral+of+x%5E3+from+0+to+10" target="_blank">Check answer on Wolfram Alpha</a>
+            </h4>
           </div>
         </div>
-      </div>
-
-      <br></br>
-
-      <div class="center">
-        <h4>Add New Line (%)</h4>
-        <input type="text" placeholder="70" id="percentStocks"/>
-        <button id="addLine">Add Line</button>
-        <button id="clear">Clear All Data</button>
       </div>
 
       <div class="col-md-10 col-md-offset-1">
@@ -135,6 +125,7 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-    <script src="scripts/asset_allocation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.5/math.min.js"></script>
+    <script src="scripts/stochastic_appx.js"></script>
   </body>
 </html>
