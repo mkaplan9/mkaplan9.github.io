@@ -56,3 +56,11 @@
 .wide {
   margin: 100px;
 }
+
+.footer {
+  margin-right: 10px;
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+}
+
