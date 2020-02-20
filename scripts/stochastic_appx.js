@@ -1,42 +1,67 @@
-var ctx = document.getElementById('myChart').getContext('2d');
+var baseChart = document.getElementById('myChart').getContext('2d');
 
-var strFormula = "x^3"
-var ticks = 10
-var orange = 'rgb(247, 142, 98)'
-var yellow = 'rgb(255, 204, 0)'
+var _strFormula = "x^3";
+var _ticks = 10;
+var _orange = 'rgb(247, 142, 98)';
+var _yellow = 'rgb(255, 204, 0)';
+var _totalPointsUnderPos = 0;
+var _totalPointsOverPos = 0;
+var _totalPointsUnderNeg = 0;
+var _totalPointsOverNeg = 0;
+var _totalPoints = [0];
+var _calculatedIntegral = '';
 
 function enteredFunction(x) {
-  newY = math.evaluate(strFormula, {x: x})
-  return newY
+  newY = math.evaluate(_strFormula, {x: x});
+  return newY;
 }
 
 function denseX() {
-  return [...Array(ticks + 1).keys()]
+  return [...Array(_ticks + 1).keys()];
 }
 
 function graphFunction() {
-  var xVals = denseX()
+  var xVals = denseX();
   var data = xVals.map(x => ({x: x, y: enteredFunction(x)}));
   return data
 }
 
+function maxY() {
+  return Math.max(0, Math.max(...denseX().map(x => enteredFunction(x))));
+}
+
+function minY() {
+  return Math.min(0, Math.min(...denseX().map(x => enteredFunction(x))));
+}
+
 function generatePoint() {
-  randomX = Math.random() * ticks;
-  randomY = Math.random() * enteredFunction(ticks);
+  randomX = Math.random() * _ticks;
+  randomY = Math.random() * (maxY() - minY()) + minY();
   yVal = enteredFunction(randomX)
 
   return {pt: {x: randomX, y: randomY}, yVal}
 }
 
 document.getElementById('graph').addEventListener('click', function() {
-  strFormula = document.getElementById('strFormula').value
+  _strFormula = document.getElementById('strFormula').value
   graph()
 });
 
 function graph() {
-  config.data.datasets[0].label = strFormula
-  config.data.datasets[0].data = graphFunction()
-  chart.update();
+  line = config.data.datasets[0];
+  line.label = _strFormula;
+  line.data = graphFunction();
+
+  config.data.datasets = [line];
+  _totalPointsUnderPos = 0;
+  _totalPointsOverPos = 0;
+  _totalPointsUnderNeg = 0;
+  _totalPointsOverNeg = 0;
+  _totalPoints = [0];
+  _calculatedIntegral = '';
+
+  updateWolfram()
+  render();
 }
 
 document.getElementById('simulate').addEventListener('click', function() {
@@ -47,62 +72,86 @@ document.getElementById('simulate').addEventListener('click', function() {
 function simulate(numPoints) {
   if(numPoints <= 10000 && numPoints >= 0) {
     points = [...Array(numPoints).keys()].map(x => generatePoint())
-    pointsUnder = points.filter(point => point.pt.y < point.yVal).map(point => point.pt)
-    pointsOver = points.filter(point => point.pt.y >= point.yVal).map(point => point.pt)
+    pointsUnderPos = points.filter(point => (point.pt.y < point.yVal) && (point.pt.y > 0)).map(point => point.pt)
+    pointsOverPos = points.filter(point => (point.pt.y >= point.yVal) && (point.pt.y > 0)).map(point => point.pt)
+    pointsUnderNeg = points.filter(point => (point.pt.y > point.yVal) && (point.pt.y < 0)).map(point => point.pt)
+    pointsOverNeg = points.filter(point => (point.pt.y <= point.yVal) && (point.pt.y < 0)).map(point => point.pt)
 
+    console.log("asdfsadfasdf")
     if(config.data.datasets.length === 1) {
       config.data.datasets.push({
         label: "Points Under",
-        borderColor: orange,
-        pointBackgroundColor: orange,
-        data: pointsUnder,
+        borderColor: _orange,
+        pointBackgroundColor: _orange,
+        data: pointsUnderPos.concat(pointsUnderNeg),
         fill: false,
         showLine: false
       })
       config.data.datasets.push({
         label: "Points Over",
-        borderColor: yellow,
-        pointBackgroundColor: yellow,
-        data: pointsOver,
+        borderColor: _yellow,
+        pointBackgroundColor: _yellow,
+        data: pointsOverPos.concat(pointsOverNeg),
         fill: false,
         showLine: false
       })
     } else {
-      pointsUnder = config.data.datasets[1].data.concat(pointsUnder)
-      pointsOver = config.data.datasets[2].data.concat(pointsOver)
-      config.data.datasets[1] = {
+      config.data.datasets.push({
         label: "Points Under",
-        borderColor: orange,
-        pointBackgroundColor: orange,
-        data: pointsUnder,
+        borderColor: _orange,
+        pointBackgroundColor: _orange,
+        data: pointsUnderPos.concat(pointsUnderNeg),
         fill: false,
         showLine: false
-      }
-      config.data.datasets[2] = {
+      })
+      config.data.datasets.push({
         label: "Points Over",
-        borderColor: yellow,
-        pointBackgroundColor: yellow,
-        data: pointsOver,
+        borderColor: _yellow,
+        pointBackgroundColor: _yellow,
+        data: pointsOverPos.concat(pointsOverNeg),
         fill: false,
         showLine: false
-      }
+      })
     }
 
-    totalPoints = pointsUnder.length + pointsOver.length
-    areaUnderCurve = (pointsUnder.length / totalPoints) * (ticks * enteredFunction(ticks))
-    updatePoints(totalPoints)
-    updateIntegral(areaUnderCurve)
+
+    _totalPointsUnderPos += pointsUnderPos.length;
+    _totalPointsOverPos += pointsOverPos.length;
+    _totalPointsUnderNeg += pointsUnderNeg.length;
+    _totalPointsOverNeg += pointsOverNeg.length;
+    _totalPoints = [_totalPoints[_totalPoints.length - 1] + numPoints]
+    _calculatedIntegralPos = (_totalPointsUnderPos / _totalPoints[_totalPoints.length - 1]) * (_ticks * (maxY() - minY()))
+    _calculatedIntegralNeg = (_totalPointsUnderNeg / _totalPoints[_totalPoints.length - 1]) * (_ticks * (maxY() - minY()))
+    _calculatedIntegral = _calculatedIntegralPos - _calculatedIntegralNeg
+
+    console.log(_calculatedIntegralPos)
+    console.log(_calculatedIntegralNeg)
+
+
+
+    updatePoints()
+    updateIntegral()
 
     chart.update();
   }
 }
 
-function updatePoints(totalPoints) {
-  document.getElementById('totalPoints').innerHTML = totalPoints
+function updatePoints() {
+  document.getElementById('totalPoints').innerHTML = _totalPoints[_totalPoints.length - 1];
 }
 
-function updateIntegral(areaUnderCurve) {
-  document.getElementById('calculatedIntegral').innerHTML = areaUnderCurve
+function updateIntegral() {
+  document.getElementById('calculatedIntegral').innerHTML = Math.round(_calculatedIntegral * 100) / 100;
+}
+
+function updateWolfram() {
+  document.getElementById('wolframLink').href = `https://www.wolframalpha.com/input/?i=integral+of+${_strFormula}+from+0+to+10`;
+}
+
+function render() {
+  chart.update();
+  updatePoints();
+  updateIntegral();
 }
 
 
@@ -114,7 +163,7 @@ var config = {
   // The data for our dataset
   data: {
     datasets: [{
-      label: strFormula,
+      label: _strFormula,
       borderColor: 'rgb(255, 99, 132)',
       data: graphFunction(),
       fill: false
@@ -123,13 +172,16 @@ var config = {
 
   // Configuration options go here
   options: {
+    legend: {
+      display: false
+    },
     title: {
       display: true,
       text: 'Stochastic Approximation'
     },
     scales: {
       yAxes: [{
-        ticks: {
+        _ticks: {
           beginAtZero: true,
         }
       }],
@@ -141,4 +193,4 @@ var config = {
   }
 }
 
-var chart = new Chart(ctx, config);
+var chart = new Chart(baseChart, config);

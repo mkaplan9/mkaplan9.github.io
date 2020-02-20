@@ -63,38 +63,55 @@
       </nav>
     </div>
 
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
     <div class="container marketing">
-      <h4>Function</h4>
-      <input type="text" id="strFormula"/>
-      <button id="graph">Graph</button>
-      <h4>Num Points</h4>
-      <input type="text" id="numPoints"/>
-      <button id="simulate">Simulate</button>
+      <div class="row">
+        <div class="col-md-4 col-md-offset-2">
+          <div class="col-md-10">
+            <h2 class="featurette-heading">Stochastic Approximation</h2>
+            <p class="justify">
+              This tool allows you to experiment with Monte Carlo integration.
+              You can graph a function, and then estimate the definite integral
+              from 0 to 10 using as many points as you'd like (more
+              than 5k is pretty slow though, depending on your hardware).
+              To get started, try graphing `x^2` and then add 100 points at
+              a time. What does the integral converge to?
+            </p>
+          </div>
+        </div>
+        <div class="col-md-5" style="padding-top: 25px">
+          <div style="border: 2px solid grey; padding: 10px">
+            <h3 class="center" style="margin-top: 0px">Settings</h3>
 
-      <canvas id="myChart"></canvas>
+            <h4 class="aa-input-label">Set Function</h4>
+            <input type="text" placeholder="x^3" value="x^3" id="strFormula"/>
+            <button id="graph">Graph new function</button>
 
-      <br></br>
+            <h4 class="aa-input-label">Number of points</h4>
+            <input type="text" placeholder="1000" value=100 id="numPoints"/>
+            <button id="simulate">Add points to simulation</button>
 
+            <div class="row">
+              <h4 class="col-md-6">Total Points: </h4>
+              <h4 class="col-md-6" id="totalPoints"></h4>
+            </div>
+            <div class="row">
+              <h4 class="col-md-6">Calculated Integral: </h4>
+              <h4 class="col-md-6" id="calculatedIntegral"></h4>
+            </div>
 
-      <h4>Total Points: </h4>
-      <h4 id="totalPoints"></h4>
-      <br></br>
-      <h4>Calculated Integral: </h4>
-      <h4 id="calculatedIntegral"></h4>
+            <h4>
+              <a id="wolframLink" href="https://www.wolframalpha.com/input/?i=integral+of+x%5E3+from+0+to+10" target="_blank">Check answer on Wolfram Alpha</a>
+            </h4>
+          </div>
+        </div>
+      </div>
 
-
-
-      <br></br>
-
-      <!-- FOOTER -->
-      <footer>
-        <p class="right">&copy; 2018 Max Kaplan</p>
-      </footer>
+      <div class="col-md-10 col-md-offset-1">
+        <canvas id="myChart" style="padding-top: 20px;"></canvas>
+      </div>
     </div>
+    <br></br>
+    <br></br>
 
 
     <!-- Bootstrap core JavaScript
