@@ -4,8 +4,10 @@ var _strFormula = "x^3";
 var _ticks = 10;
 var _orange = 'rgb(247, 142, 98)';
 var _yellow = 'rgb(255, 204, 0)';
-var _totalPointsUnder = 0;
-var _totalPointsOver = 0;
+var _totalPointsUnderPos = 0;
+var _totalPointsOverPos = 0;
+var _totalPointsUnderNeg = 0;
+var _totalPointsOverNeg = 0;
 var _totalPoints = [0];
 var _calculatedIntegral = '';
 
@@ -25,11 +27,11 @@ function graphFunction() {
 }
 
 function maxY() {
-  return Math.max(...denseX().map(x => enteredFunction(x)));
+  return Math.max(0, Math.max(...denseX().map(x => enteredFunction(x))));
 }
 
 function minY() {
-  return Math.min(...denseX().map(x => enteredFunction(x)));
+  return Math.min(0, Math.min(...denseX().map(x => enteredFunction(x))));
 }
 
 function generatePoint() {
@@ -51,11 +53,14 @@ function graph() {
   line.data = graphFunction();
 
   config.data.datasets = [line];
-  _totalPointsUnder = 0;
-  _totalPointsOver = 0;
+  _totalPointsUnderPos = 0;
+  _totalPointsOverPos = 0;
+  _totalPointsUnderNeg = 0;
+  _totalPointsOverNeg = 0;
   _totalPoints = [0];
   _calculatedIntegral = '';
 
+  updateWolfram()
   render();
 }
 
@@ -67,15 +72,18 @@ document.getElementById('simulate').addEventListener('click', function() {
 function simulate(numPoints) {
   if(numPoints <= 10000 && numPoints >= 0) {
     points = [...Array(numPoints).keys()].map(x => generatePoint())
-    pointsUnder = points.filter(point => point.pt.y < point.yVal).map(point => point.pt)
-    pointsOver = points.filter(point => point.pt.y >= point.yVal).map(point => point.pt)
+    pointsUnderPos = points.filter(point => (point.pt.y < point.yVal) && (point.pt.y > 0)).map(point => point.pt)
+    pointsOverPos = points.filter(point => (point.pt.y >= point.yVal) && (point.pt.y > 0)).map(point => point.pt)
+    pointsUnderNeg = points.filter(point => (point.pt.y > point.yVal) && (point.pt.y < 0)).map(point => point.pt)
+    pointsOverNeg = points.filter(point => (point.pt.y <= point.yVal) && (point.pt.y < 0)).map(point => point.pt)
 
+    console.log("asdfsadfasdf")
     if(config.data.datasets.length === 1) {
       config.data.datasets.push({
         label: "Points Under",
         borderColor: _orange,
         pointBackgroundColor: _orange,
-        data: pointsUnder,
+        data: pointsUnderPos.concat(pointsUnderNeg),
         fill: false,
         showLine: false
       })
@@ -83,7 +91,7 @@ function simulate(numPoints) {
         label: "Points Over",
         borderColor: _yellow,
         pointBackgroundColor: _yellow,
-        data: pointsOver,
+        data: pointsOverPos.concat(pointsOverNeg),
         fill: false,
         showLine: false
       })
@@ -92,7 +100,7 @@ function simulate(numPoints) {
         label: "Points Under",
         borderColor: _orange,
         pointBackgroundColor: _orange,
-        data: pointsUnder,
+        data: pointsUnderPos.concat(pointsUnderNeg),
         fill: false,
         showLine: false
       })
@@ -100,16 +108,27 @@ function simulate(numPoints) {
         label: "Points Over",
         borderColor: _yellow,
         pointBackgroundColor: _yellow,
-        data: pointsOver,
+        data: pointsOverPos.concat(pointsOverNeg),
         fill: false,
         showLine: false
       })
     }
 
-    _totalPointsUnder += pointsUnder.length;
-    _totalPointsOver += pointsOver.length;
+
+    _totalPointsUnderPos += pointsUnderPos.length;
+    _totalPointsOverPos += pointsOverPos.length;
+    _totalPointsUnderNeg += pointsUnderNeg.length;
+    _totalPointsOverNeg += pointsOverNeg.length;
     _totalPoints = [_totalPoints[_totalPoints.length - 1] + numPoints]
-    _calculatedIntegral = (_totalPointsUnder / _totalPoints[_totalPoints.length - 1]) * (_ticks * (maxY() - minY()))
+    _calculatedIntegralPos = (_totalPointsUnderPos / _totalPoints[_totalPoints.length - 1]) * (_ticks * (maxY() - minY()))
+    _calculatedIntegralNeg = (_totalPointsUnderNeg / _totalPoints[_totalPoints.length - 1]) * (_ticks * (maxY() - minY()))
+    _calculatedIntegral = _calculatedIntegralPos - _calculatedIntegralNeg
+
+    console.log(_calculatedIntegralPos)
+    console.log(_calculatedIntegralNeg)
+
+
+
     updatePoints()
     updateIntegral()
 
@@ -122,7 +141,11 @@ function updatePoints() {
 }
 
 function updateIntegral() {
-  document.getElementById('calculatedIntegral').innerHTML = _calculatedIntegral;
+  document.getElementById('calculatedIntegral').innerHTML = Math.round(_calculatedIntegral * 100) / 100;
+}
+
+function updateWolfram() {
+  document.getElementById('wolframLink').href = `https://www.wolframalpha.com/input/?i=integral+of+${_strFormula}+from+0+to+10`;
 }
 
 function render() {
