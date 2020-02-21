@@ -69,6 +69,10 @@ document.getElementById('simulate').addEventListener('click', function() {
   simulate(numPoints)
 });
 
+document.getElementById('clear').addEventListener('click', function() {
+  graph()
+});
+
 function simulate(numPoints) {
   if(numPoints <= 10000 && numPoints >= 0) {
     points = [...Array(numPoints).keys()].map(x => generatePoint())
@@ -145,7 +149,7 @@ function updateIntegral() {
 }
 
 function updateWolfram() {
-  document.getElementById('wolframLink').href = `https://www.wolframalpha.com/input/?i=integral+of+${_strFormula}+from+0+to+10`;
+  document.getElementById('wolframLink').href = `https://www.wolframalpha.com/input/?i=integral+of+${encodeURIComponent(_strFormula)}+from+0+to+10`;
 }
 
 function render() {
