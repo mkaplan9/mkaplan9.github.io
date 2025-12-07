@@ -81,9 +81,8 @@ def main():
     html_posts_list = ''
     for (title, date, html_path) in all_posts:
         print(title)
-        html_posts_list = html_posts_list + f'<a href="./{html_path}"><div class="col-md-12 col-md-offset-0"><h2>{title}</h2><h4>{date}</h4></div></a>'
+        html_posts_list = f'<a href="./{html_path}"><div class="col-md-12 col-md-offset-0"><h2>{title}</h2><h4>{date}</h4></div></a>' + html_posts_list
 
-    print(html_posts_list)
     blog_page = blog_page.replace('{{ blog_posts }}', html_posts_list)
 
     with open(blog_home_path, 'w', encoding='utf-8') as file:

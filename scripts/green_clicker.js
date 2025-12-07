@@ -88,7 +88,6 @@ class GreenClicker {
   }
 
   buyUpgrade(upgradeId) {
-    console.log('buyUpgrade', upgradeId);
     const upgrade = this.upgrades.find(u => u.id === upgradeId);
     if (!upgrade) return;
 
