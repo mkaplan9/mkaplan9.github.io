@@ -1,0 +1,194 @@
+<!-- DO NOT EDIT! Edit the raw_pages file instead -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="./assets/favicon.ico">
+    <title>Max Kaplan</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link href="./stylesheet.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="navbar-wrapper">
+      <nav class="navbar-inverse navbar-static-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="./index.html">Max Kaplan</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="./index.html">Home</a></li>
+              <li><a href="./about.html">About</a></li>
+              <!-- <li><a href="./blog.html">Blog</a></li> -->
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    
+    
+    <div class="container marketing">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h2 class="featurette-heading">Green Clicker</h2>
+          <p class="justify">
+            Click to generate clean energy! Build renewable energy infrastructure to generate energy automatically.
+            Your progress is saved automatically.
+          </p>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 30px;">
+        <div class="col-md-6 col-md-offset-3">
+          <div style="text-align: center; padding: 20px; background-color: #f5f5f5; border-radius: 10px; margin-bottom: 30px;">
+            <h2 style="margin-top: 0; color: #2c5530;">Energy: <span id="energyDisplay">0</span></h2>
+            <p style="font-size: 18px; color: #4a7c59; margin-bottom: 20px;">
+              <span id="energyPerSecond">+0/sec</span>
+            </p>
+            <button 
+              id="clickButton" 
+              style="
+                font-size: 24px; 
+                padding: 20px 40px; 
+                background-color: #4CAF50; 
+                color: white; 
+                border: none; 
+                border-radius: 10px; 
+                cursor: pointer;
+                transition: transform 0.1s;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+              "
+              onmouseover="this.style.backgroundColor='#45a049'"
+              onmouseout="this.style.backgroundColor='#4CAF50'"
+            >
+              ⚡ Generate Energy ⚡
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+          <h3 style="text-align: center; margin-bottom: 20px;">Upgrades</h3>
+          <div id="upgradesContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+            <!-- Upgrades will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <br></br>
+    <br></br>
+
+    
+    <script>
+      // Create upgrade cards dynamically before game initializes
+      const upgrades = [
+        { id: 'solar', emoji: '☀️', color: '#FFD700' },
+        { id: 'wind', emoji: '💨', color: '#87CEEB' },
+        { id: 'geothermal', emoji: '🌋', color: '#FF6347' },
+        { id: 'hydro', emoji: '💧', color: '#1E90FF' },
+        { id: 'nuclear', emoji: '⚛️', color: '#FF1493' }
+      ];
+
+      function createUpgradeCards() {
+        const container = document.getElementById('upgradesContainer');
+        if (!container) return;
+        
+        upgrades.forEach(upgrade => {
+          const card = document.createElement('div');
+          card.style.cssText = `
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 200px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          `;
+          
+          card.innerHTML = `
+            <div style="text-align: center; font-size: 48px; margin-bottom: 10px;">${upgrade.emoji}</div>
+            <h4 style="text-align: center; margin-top: 0; margin-bottom: 10px;" id="name-${upgrade.id}"></h4>
+            <p style="text-align: center; font-size: 12px; color: #666; margin-bottom: 10px;" id="desc-${upgrade.id}"></p>
+            <p style="text-align: center; margin: 5px 0;">
+              <strong>Cost:</strong> <span id="cost-${upgrade.id}">0</span> energy
+            </p>
+            <p style="text-align: center; margin: 5px 0;">
+              <strong>Owned:</strong> <span id="owned-${upgrade.id}">0</span>
+            </p>
+            <button 
+              id="buy-${upgrade.id}" 
+              style="
+                width: 100%;
+                padding: 10px;
+                margin-top: 10px;
+                background-color: ${upgrade.color};
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: opacity 0.3s;
+              "
+            >
+              Buy
+            </button>
+          `;
+          
+          container.appendChild(card);
+        });
+      }
+
+      // Create cards first, then prevent auto-initialization and initialize manually
+      function initializeGame() {
+        createUpgradeCards();
+        // Small delay to ensure DOM is fully ready
+        setTimeout(() => {
+          if (!window.game) {
+            window.game = new GreenClicker();
+            // Update upgrade names and descriptions
+            window.game.upgrades.forEach(upgrade => {
+              const nameEl = document.getElementById(`name-${upgrade.id}`);
+              const descEl = document.getElementById(`desc-${upgrade.id}`);
+              if (nameEl) nameEl.textContent = upgrade.name;
+              if (descEl) descEl.textContent = upgrade.description;
+            });
+            window.game.updateDisplay();
+          }
+        }, 50);
+      }
+
+      // Prevent the auto-initialization in green_clicker.js
+      window.preventAutoInit = true;
+
+      // Initialize when ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeGame);
+      } else {
+        initializeGame();
+      }
+    </script>
+    <script src="scripts/green_clicker.js"></script>
+
+
+
+    <!-- FOOTER -->
+    <br></br>
+    <footer class="footer">
+      <p class="right">&copy; 2025 Max Kaplan</p>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>
