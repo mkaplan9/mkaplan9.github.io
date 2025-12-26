@@ -45,7 +45,7 @@ def main():
 
     all_posts = []
     # Iterate over all dirs in the posts directory
-    for file_name_md in os.listdir(posts_dir):
+    for file_name_md in sorted(os.listdir(posts_dir)):
         # Construct full file path
         file_path = os.path.join(posts_dir, file_name_md)
 
@@ -81,7 +81,7 @@ def main():
     html_posts_list = ''
     for (title, date, html_path) in all_posts:
         print(title)
-        html_posts_list = f'<a href="./{html_path}"><div class="col-md-12 col-md-offset-0"><h2>{title}</h2><h4>{date}</h4></div></a>' + html_posts_list
+        html_posts_list = f'<a href="./{html_path}"><div class="col-md-12 col-md-offset-0"><h2>{title}</h2><h4>{date}</h4></div></a>\n' + html_posts_list
 
     blog_page = blog_page.replace('{{ blog_posts }}', html_posts_list)
 
