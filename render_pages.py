@@ -2,8 +2,11 @@
 
 import os
 import markdown2
+from markdown_it import MarkdownIt
 
 def main():
+    md = MarkdownIt()
+
     # Define the directory containing the Markdown files
     pages_dir = './raw_pages'
     posts_dir = './raw_blog_posts'
@@ -57,7 +60,7 @@ def main():
         date = md_content.split("## ", 1).pop(1).split("\n").pop(0)
 
         # Convert Markdown to HTML
-        html_content = markdown2.markdown(md_content, extras=['fenced-code-blocks', "header-ids"])
+        html_content = md.render(md_content)
         html_content = '<div class="container marketing"><br></br><div class="col-md-12 col-md-offset-0">' + html_content + '</div><br></br></div>'
         html_content = template.replace('{{ content }}', html_content)
         html_content = html_content.replace('href="./', 'href="../')
